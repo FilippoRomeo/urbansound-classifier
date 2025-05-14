@@ -1,0 +1,25 @@
+# Byte-compiled / cached files
+__pycache__/
+*.py[cod]
+*.so
+
+# Dataset and large files
+UrbanSound8K/
+features/
+checkpoints/
+
+# Environment and package files
+*.env
+.env/
+.venv/
+*.egg-info/
+*.log
+
+# OS / IDE-specific
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python notebooks (if you ever add them)
+*.ipynb_checkpoints/
