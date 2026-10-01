@@ -1,163 +1,102 @@
-# 🎧 Urban Sound Classifier – CNN with Mel Spectrograms
+# Urban Sound Classifier
 
-This project implements a Convolutional Neural Network (CNN) in PyTorch to classify urban sounds using the [UrbanSound8K](https://urbansounddataset.weebly.com/urbansound8k.html) dataset. It follows the official **10-fold cross-validation protocol** using **Mel spectrograms** as input features.
+A PyTorch audio-classification experiment built on **UrbanSound8K**, using Mel spectrograms as input to a convolutional neural network and respecting the dataset's official 10-fold evaluation protocol.
 
----
+## Pipeline
 
-## 🗂 Dataset Overview
-
-**UrbanSound8K** contains 8732 short audio clips (≤ 4s), categorized into 10 common urban sound classes:
-
-- air_conditioner
-- car_horn
-- children_playing
-- dog_bark
-- drilling
-- engine_idling
-- gun_shot
-- jackhammer
-- siren
-- street_music
-
-Each clip is assigned to one of **10 predefined folds**, which must be used for valid cross-validation.
-
----
-
-## 📁 Project Structure
-
+```text
+UrbanSound8K audio
+       ↓
+log-Mel spectrogram preprocessing
+       ↓
+fold-aware PyTorch dataset
+       ↓
+CNN classifier
+       ↓
+per-fold checkpoints
+       ↓
+accuracy, classification report, confusion matrix
 ```
+
+## Why the fold protocol matters
+
+UrbanSound8K contains 8,732 labelled clips across 10 sound classes. The dataset ships with predefined folds, so evaluation should preserve those folds instead of randomly splitting clips. This repository keeps that structure throughout training and evaluation.
+
+Classes include:
+
+`air_conditioner` · `car_horn` · `children_playing` · `dog_bark` · `drilling` · `engine_idling` · `gun_shot` · `jackhammer` · `siren` · `street_music`
+
+## Project structure
+
+```text
 urban_sound_classifier/
-├── config.py                # Global settings and paths
-├── download_dataset.py      # Downloads UrbanSound8K using soundata
-├── preprocess_audio.py      # Converts .wav → Mel spectrograms (.npy)
-├── dataset.py               # PyTorch Dataset with fold support
-├── model.py                 # CNN architecture
-├── train.py                 # 10-fold cross-validation training
-├── evaluate.py              # Evaluation + metrics for individual folds
-├── checkpoints/             # Saved models (1 per fold)
-├── features/                # Precomputed spectrograms
-└── UrbanSound8K/            # Raw dataset audio + metadata
+├── config.py
+├── download_dataset.py
+├── preprocess_audio.py
+├── dataset.py
+├── model.py
+├── train.py
+├── evaluate.py
+├── checkpoints/
+├── features/
+└── UrbanSound8K/
 ```
 
----
+## Quick start
 
-## 🧠 Pipeline Overview
-
-```
-.wav → Mel Spectrogram (.npy)
-     ↓
-CNN Classifier (fold-wise)
-     ↓
-Model per Fold → Evaluation → Confusion Matrix + Report
-```
-
----
-
-## 🚀 Getting Started
-
-### 1. Install Requirements
+Install the main dependencies:
 
 ```bash
 pip install torch librosa soundata scikit-learn matplotlib seaborn
 ```
 
----
-
-### 2. Download Dataset
+Download and validate UrbanSound8K:
 
 ```bash
 python download_dataset.py
 ```
 
-This uses `soundata` to download and validate the UrbanSound8K dataset into the `UrbanSound8K/` folder.
-
----
-
-### 3. Preprocess Audio
+Convert the audio into log-Mel spectrogram arrays:
 
 ```bash
 python preprocess_audio.py
 ```
 
-This converts each `.wav` file into a **log-scaled Mel spectrogram** and saves it as a `.npy` array under `features/{class}/{clip_id}.npy`.
-
----
-
-### 4. Train the Classifier
+Train across the predefined folds:
 
 ```bash
 python train.py
 ```
 
-This performs **10-fold cross-validation**, training a separate model for each fold and saving them under `checkpoints/`.
-
----
-
-### 5. Evaluate a Fold
+Evaluate an individual fold:
 
 ```bash
 python evaluate.py --fold 1
 ```
 
-Generates:
-- Accuracy
-- Classification report
-- Confusion matrix heatmap
+Evaluation produces accuracy, a classification report, and a confusion matrix for the selected fold.
 
----
+## Example result
 
-## 📊 Example Results (Fold 1)
+An example recorded for fold 1 reached approximately **0.67 accuracy**. That value is included as an experiment result, not as a benchmark claim for other environments or model revisions.
 
-```
-✅ Accuracy for Fold 1: 0.6667
+## Stack
 
-🧾 Classification Report:
-air_conditioner     f1-score: 0.35
-car_horn            f1-score: 0.97
-children_playing    f1-score: 0.82
-...
-macro avg           f1-score: 0.69
-```
+`Python` `PyTorch` `librosa` `soundata` `scikit-learn` `Mel spectrograms` `CNN`
 
----
+## What this project demonstrates
 
-## ✅ Key Features
+- fold-aware dataset handling rather than random train/test splitting
+- audio preprocessing into model-ready time-frequency representations
+- a complete PyTorch training and checkpoint workflow
+- per-fold evaluation and visual diagnostics
 
-- ✅ Uses **official 10-fold split** — no data leakage
-- ✅ **Mel spectrogram preprocessing** via librosa
-- ✅ Clean, modular PyTorch codebase
-- ✅ Per-fold **model saving** and evaluation
-- ✅ **Confusion matrix visualization**
-- ⚙️ Ready for model upgrades (ResNet, AST, transformers)
+## Possible next experiments
 
----
+The current CNN is intentionally straightforward. Natural extensions include SpecAugment, stronger convolutional backbones, pretrained audio encoders, or a realtime inference interface.
 
-## 🧠 Ideas for Expansion
+## Dataset citation
 
-- Add **SpecAugment** or `torchaudio` transforms
-- Use a **deeper CNN or pretrained model**
-- Deploy as a **real-time audio classifier** with mic input
-- Export results and plots to PDF/CSV for reporting
+J. Salamon, C. Jacoby, and J. P. Bello, *A Dataset and Taxonomy for Urban Sound Research*, ACM Multimedia, 2014.
 
----
-
-## 📄 Citation
-
-If using the dataset or referencing this structure, cite:
-
-> J. Salamon, C. Jacoby, and J.P. Bello,  
-> “A Dataset and Taxonomy for Urban Sound Research,”  
-> ACM Multimedia 2014.
-
----
-
-## 👤 Author
-
-Created by [https://github.com/FilippoRomeo]   
-📫 Reach out for collaboration, ideas, or improvements!
-
----
-
-## 🧪 License
-
-This repo is open-source under the MIT License. UrbanSound8K is shared for non-commercial research purposes. See their terms of use [here](https://urbansounddataset.weebly.com/urbansound8k.html).
+UrbanSound8K has its own usage terms; refer to the dataset documentation when redistributing or using the audio.
